@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KSG Goverment - Kadrioru Saksa Gümnaasiumi Korrakaitse Portaal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/jpeg" href="assets/ksg_logo.jpg">
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- Top Tactical Navigation Bar -->
+    <header class="tactical-header">
+      <div class="header-left">
+        <div class="logo-wrapper">
+          <img src="assets/ksg_logo.jpg" alt="KSG Goverment Logo" class="brand-crest" id="headerLogo">
+          <div class="crest-glow"></div>
+        </div>
+        <div class="brand-text">
+          <div class="brand-title">
+            <span class="gold-text">KSG</span> GOVERMENT
+          </div>
+          <div class="brand-subtitle">Kadrioru Saksa Gümnaasiumi Korrakaitse & Juhtkond</div>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <!-- Live status indicator -->
+        <div class="live-pill" id="wsStatusPill">
+          <span class="status-dot green"></span>
+          <span class="live-text">SÜSTEEM ONLINE</span>
+        </div>
+
+        <!-- User profile widget -->
+        <div class="user-profile-widget" id="userProfileWidget">
+          <div class="unauthed-actions" id="unauthedBox">
+            <button class="btn btn-secondary btn-sm" id="btnOpenLoginModal">Logi sisse</button>
+            <button class="btn btn-primary btn-sm" id="btnOpenRegisterModal">Registreeru</button>
+          </div>
+
+          <div class="authed-box hidden" id="authedBox">
+            <div class="user-meta">
+              <div class="user-name-line">
+                <span class="user-display-name" id="userNameLabel">Kasutaja</span>
+                <span class="role-badge" id="userRoleBadge">Kodanik</span>
+              </div>
+              <div class="user-tag-line" id="userTagLabel">Õpilane</div>
+            </div>
+            <button class="btn btn-danger-outline btn-xs" id="btnLogout">Välju</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Navigation Tabs -->
+    <nav class="tactical-nav">
+      <div class="nav-tabs" id="navTabs">
+        <button class="nav-tab active" data-tab="announcements">
+          <span class="tab-icon">📢</span> Teated
+        </button>
+        <button class="nav-tab" data-tab="cases">
+          <span class="tab-icon">📁</span> Toimikud / Juhtumid
+        </button>
+        <button class="nav-tab" data-tab="signup-officer">
+          <span class="tab-icon">📝</span> Kandideeri Ohvitseriks
+        </button>
+        <button class="nav-tab" data-tab="officers-list">
+          <span class="tab-icon">🛡️</span> Ohvitseride Koosseis
+        </button>
+        <!-- Officer Only Tabs -->
+        <button class="nav-tab officer-only hidden" data-tab="applications-review">
+          <span class="tab-icon">📋</span> Avalduste Ülevaatus
+          <span class="badge-count hidden" id="pendingAppsCount">0</span>
+        </button>
+        <button class="nav-tab officer-only hidden" data-tab="users-management">
+          <span class="tab-icon">👥</span> Kasutajate Haldus & Monitor
+        </button>
+        <!-- Roger SuperAdmin Tab Only -->
+        <button class="nav-tab roger-only hidden" data-tab="roger-headquarters">
+          <span class="tab-icon">⭐</span> Roger Juhtkond & Koodid
+          <span class="badge-count hidden" id="pendingNominationsCount">0</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Notification / Warning Alert Banner for Logged in User -->
+    <div class="alert-banner-container hidden" id="userWarningBanner">
+      <div class="alert-banner warning">
+        <div class="alert-icon">⚠️</div>
+        <div class="alert-content">
+          <strong id="bannerWarningTitle">Teil on aktiivne hoiatus korrareeglite rikkumise eest!</strong>
+          <p id="bannerWarningText">Palun tutvuge KSG Goverment reeglitega.</p>
+        </div>
+        <button class="btn btn-secondary btn-sm" id="btnDismissWarning">Sain aru</button>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+
+      <!-- ============================================================== -->
+      <!-- TAB 1: TEATED (ANNOUNCEMENTS)                                  -->
+      <!-- ============================================================== -->
+      <section class="tab-panel active" id="tab-announcements">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">📢 KSG Goverment Ametlikud Teated</h2>
+            <p class="panel-desc">Kõik ametlikud teadaanded, operatiivsed käsud ja koolirahu reeglid.</p>
+          </div>
+          <div class="panel-actions officer-only hidden">
+            <button class="btn btn-primary" id="btnOpenNewAnnouncement">
+              <span class="icon">+</span> Lisa Uus Teadaanne
+            </button>
+          </div>
+        </div>
+
+        <div class="announcements-grid" id="announcementsList">
+          <!-- Announcements rendered dynamically -->
+          <div class="loading-spinner">Laadin teateid...</div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 2: TOIMIKUD / JUHTUMID (CASES)                             -->
+      <!-- ============================================================== -->
+      <section class="tab-panel" id="tab-cases">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">📁 Juhtumid ja Toimikud (Cases)</h2>
+            <p class="panel-desc">Toimikule ligipääsuks sisesta 5-kohaline kood. Ohvitserid saavad luua uusi toimikuid ja määrata koode.</p>
+          </div>
+          <div class="panel-actions officer-only hidden">
+            <button class="btn btn-primary" id="btnOpenNewCaseModal">
+              <span class="icon">+</span> Loo Uus Toimik
+            </button>
+          </div>
+        </div>
+
+        <!-- Case Code Lookup Bar -->
+        <div class="case-lookup-card">
+          <div class="lookup-heading">
+            <span class="shield-badge">🔒 TURVATUD TOIMIKU VAATAJA</span>
+            <h3>Sisesta toimiku 5-kohaline turvakood</h3>
+            <p>Kui ohvitser jagas teiega juhtumi koodi, sisestage see siia toimiku avamiseks:</p>
+          </div>
+          <form class="lookup-form" id="caseLookupForm">
+            <div class="code-input-group">
+              <input type="text" maxlength="5" pattern="[0-9]{5}" class="case-code-input" id="caseCodeInput" placeholder="12345" autocomplete="off" required>
+              <button type="submit" class="btn btn-primary">
+                Ava Toimik
+              </button>
+            </div>
+            <div class="lookup-error hidden" id="caseLookupError"></div>
+          </form>
+        </div>
+
+        <!-- Case Dossier View (Unlocks when code entered or opened) -->
+        <div class="case-dossier-card hidden" id="unlockedCaseCard">
+          <div class="dossier-header">
+            <div class="dossier-tag-group">
+              <span class="badge-code" id="dossierCodeBadge">KOOD: 12345</span>
+              <span class="badge-status" id="dossierStatusBadge">Aktiivne</span>
+              <span class="badge-category" id="dossierCategoryBadge">Korra rikkumine</span>
+            </div>
+            <button class="btn btn-secondary-outline btn-sm" id="btnCloseDossier">Sulge toimik</button>
+          </div>
+
+          <h3 class="dossier-title" id="dossierTitle">Toimiku Pealkiri</h3>
+          
+          <div class="dossier-grid">
+            <div class="dossier-field">
+              <span class="field-label">Kahtlustatav / Seotud isik:</span>
+              <span class="field-value" id="dossierSuspect">Kevin K.</span>
+            </div>
+            <div class="dossier-field">
+              <span class="field-label">Toimiku koostaja:</span>
+              <span class="field-value" id="dossierAuthor">Oliver (Pea Detective)</span>
+            </div>
+            <div class="dossier-field">
+              <span class="field-label">Algatamise kuupäev:</span>
+              <span class="field-value" id="dossierDate">-</span>
+            </div>
+          </div>
+
+          <div class="dossier-section">
+            <h4>Juhtumi kirjeldus ja asjaolud</h4>
+            <div class="dossier-description" id="dossierDescription">...</div>
+          </div>
+
+          <!-- Notes / Timeline -->
+          <div class="dossier-section">
+            <h4>Uurimise märkmed ja täiendused</h4>
+            <div class="dossier-notes-list" id="dossierNotesList">
+              <!-- Notes dynamically inserted -->
+            </div>
+
+            <!-- Officers can add notes directly -->
+            <div class="add-note-box officer-only hidden" id="addNoteBox">
+              <textarea class="form-input" id="newCaseNoteText" rows="2" placeholder="Lisa uus uurimismärge toimikusse..."></textarea>
+              <button class="btn btn-secondary btn-sm" id="btnAddCaseNote">Salvesta märge</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Officers: All Cases Table / Management -->
+        <div class="officer-cases-section officer-only hidden">
+          <h3 class="subheading">Ohvitseride Toimikute Nimekiri</h3>
+          <div class="cases-table-wrapper">
+            <table class="tactical-table">
+              <thead>
+                <tr>
+                  <th>5-kohaline Kood</th>
+                  <th>Pealkiri</th>
+                  <th>Kahtlustatav</th>
+                  <th>Kategooria</th>
+                  <th>Staatus</th>
+                  <th>Koostaja</th>
+                  <th>Tegevus</th>
+                </tr>
+              </thead>
+              <tbody id="officerCasesTableBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 3: KANDIDEERI OHVITSERIKS (5-STEP FORM)                    -->
+      <!-- ============================================================== -->
+      <section class="tab-panel" id="tab-signup-officer">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">📝 Kandideeri KSG Ohvitseriks</h2>
+            <p class="panel-desc">Tule ja liitu KSG korrakaitse meeskonnaga. Vasta küsimustele ja esita avaldus.</p>
+          </div>
+        </div>
+
+        <!-- If user has already submitted an application, show their status card -->
+        <div class="my-application-card hidden" id="myApplicationCard">
+          <div class="app-status-header">
+            <h3>Teie Avalduse Staatus</h3>
+            <span class="status-pill" id="myAppStatusPill">Ootel</span>
+          </div>
+          
+          <div class="app-response-box" id="myAppResponseBox">
+            <div class="notice-box blue">
+              <span class="notice-icon">⏳</span>
+              <p><strong>Saadetud!</strong> teie vastus vaatatakse üle ja vaatatakse kas saate sisse või ei see võib võtta kuni 1 päev.</p>
+            </div>
+          </div>
+
+          <div class="app-details-block">
+            <span class="label">Teie esitatud kinnitus:</span>
+            <div class="user-submitted-text" id="myAppSubmittedText">...</div>
+          </div>
+
+          <!-- Comments Thread between Applicant and Officers -->
+          <div class="app-comments-section">
+            <h4>Vestlus ohvitseridega / Tagasiside</h4>
+            <div class="comments-list" id="myAppCommentsList">
+              <!-- Comments dynamically rendered -->
+            </div>
+
+            <form class="add-comment-form" id="myAppCommentForm">
+              <input type="text" class="form-input" id="myAppCommentInput" placeholder="Kirjutage vastus või küsimus ohvitseridele..." required>
+              <button type="submit" class="btn btn-secondary">Vasta</button>
+            </form>
+          </div>
+
+          <div class="reapply-container hidden" id="reapplyContainer">
+            <button class="btn btn-primary" id="btnReapply">Kandideeri uuesti / Muuda avaldust</button>
+          </div>
+        </div>
+
+        <!-- 5-Step Interactive Questionnaire -->
+        <div class="wizard-container" id="officerWizard">
+          <div class="wizard-progress">
+            <div class="wizard-step-bullet active" data-step="1">1</div>
+            <div class="wizard-progress-bar"><div class="bar-fill" id="wizardBarFill" style="width: 20%;"></div></div>
+            <div class="wizard-step-bullet" data-step="2">2</div>
+            <div class="wizard-step-bullet" data-step="3">3</div>
+            <div class="wizard-step-bullet" data-step="4">4</div>
+            <div class="wizard-step-bullet" data-step="5">5</div>
+          </div>
+
+          <!-- Wizard Step 1 -->
+          <div class="wizard-step active" id="wizardStep1">
+            <div class="step-card">
+              <div class="step-badge">1. LEHEKÜLG / ALUSTUS</div>
+              <h3 class="step-title">Tere tulemast KSG Goverment Sign uppimisele</h3>
+              <p class="step-description">
+                Tere tulemast KSG Goverment Sign uppimisele meie küsime teilt paar küsimust ja tee vastate õigete vastustega
+              </p>
+              <div class="step-nav">
+                <button type="button" class="btn btn-primary btn-next" data-next="2">
+                  Järgmine lehekülg (Next) &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Wizard Step 2 -->
+          <div class="wizard-step" id="wizardStep2">
+            <div class="step-card">
+              <div class="step-badge">2. LEHEKÜLG / REEGLID & HOIATUSED</div>
+              <h3 class="step-title">Käitumisreeglid ja Õppused</h3>
+              <div class="rule-box-quote">
+                Et saata meile tööle tulla peate ütlema et te ei löö kedagi nii sama, olete võrdsed et üks ei saa kamandada, et olete valmis õppusteks ika 2 päeva tagant, ei ropenda siin gruppis, ei kiusa siin gruppis, peate KSG koukorra reeglitest vastu ja teil on 5 hoiatust kui rikkude 5 korda reegleid võite välja minna aru saadav? kui jah siis minge järgmisele lehe küljele
+              </div>
+              <div class="step-nav">
+                <button type="button" class="btn btn-secondary-outline btn-prev" data-prev="1">
+                  &larr; Eelmine leht (Previous)
+                </button>
+                <button type="button" class="btn btn-primary btn-next" data-next="3">
+                  Järgmine lehekülg (Next) &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Wizard Step 3 -->
+          <div class="wizard-step" id="wizardStep3">
+            <div class="step-card">
+              <div class="step-badge">3. LEHEKÜLG / TÖÖAEG & TASU</div>
+              <h3 class="step-title">Töökohustused ja Kooliaeg</h3>
+              <div class="rule-box-quote">
+                Teie vastutate kui keegi lõhub KSG reegleid te ei kõnni lihtsalt mõõda teie töö päev on iga tund esmaspäevast reedeni ja töötate ainult kooli ajal ja see mis the teenide? see on tasuta toit ja tasuta õppimine kui näede midagi valesti ei võtta kohe kinni vaid küsid alguses ja kui tuleb kallale või proovib põgeneda siis võtke kohe kinni ja kutsuge abi kui vaja.
+              </div>
+              <div class="step-nav">
+                <button type="button" class="btn btn-secondary-outline btn-prev" data-prev="2">
+                  &larr; Eelmine leht (Previous)
+                </button>
+                <button type="button" class="btn btn-primary btn-next" data-next="4">
+                  Järgmine lehekülg (Next) &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Wizard Step 4 -->
+          <div class="wizard-step" id="wizardStep4">
+            <div class="step-card">
+              <div class="step-badge">4. LEHEKÜLG / VASTUTUS</div>
+              <h3 class="step-title">Väljaviskamise tagajärjed</h3>
+              <div class="rule-box-quote">
+                kui te olete 3 korda juba politseist välja visatud siis tee võibolla ei saagi enam politseisse tulla ja ei saagi töötada politseina aga meil on mitmeid teisi tõõsi näiteks KSG Maja Koristaja aga see ei taha keegi olla
+              </div>
+              <div class="step-nav">
+                <button type="button" class="btn btn-secondary-outline btn-prev" data-prev="3">
+                  &larr; Eelmine leht (Previous)
+                </button>
+                <button type="button" class="btn btn-primary btn-next" data-next="5">
+                  Järgmine lehekülg (Next) &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Wizard Step 5 -->
+          <div class="wizard-step" id="wizardStep5">
+            <div class="step-card">
+              <div class="step-badge">5. LEHEKÜLG / ALLKIRJASTAMINE</div>
+              <h3 class="step-title">Kinnitamine ja Avalduse Esitamine</h3>
+              <p class="step-prompt">
+                palun kirjutage alla et nõustute reeglidega ja olete valmis tõõdata meiega koos
+              </p>
+              
+              <div class="signature-box-container">
+                <label for="wizardAgreementText" class="form-label">Kirjutage oma nõustumine ja allkiri tekstikasti:</label>
+                <textarea id="wizardAgreementText" class="form-input" rows="4" placeholder="Näide: Nõustun reeglitega, luban hoida koolirahu ja olen valmis töötama meeskonnana. [Teie Täisnimi]" required></textarea>
+              </div>
+
+              <div class="step-nav">
+                <button type="button" class="btn btn-secondary-outline btn-prev" data-prev="4">
+                  &larr; Eelmine leht (Previous)
+                </button>
+                <button type="button" class="btn btn-success btn-submit" id="btnSubmitOfficerApp">
+                  Saada avaldus (Submit)
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 4: AVALDUSTE ÜLEVAATUS (OFFICERS ONLY)                     -->
+      <!-- ============================================================== -->
+      <section class="tab-panel officer-only" id="tab-applications-review">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">📋 Ohvitseriks Kandideerimiste Ülevaatus</h2>
+            <p class="panel-desc">Vaadake üle õpilaste esitatud sooviavaldused, võtke neid vastu või lükake tagasi ning lisage kommentaare.</p>
+          </div>
+        </div>
+
+        <div class="applications-container" id="officerAppsList">
+          <!-- Dynamically populated -->
+          <div class="loading-spinner">Laadin avaldusi...</div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 5: KASUTAJATE HALDUS & MONITOR (OFFICERS ONLY)             -->
+      <!-- ============================================================== -->
+      <section class="tab-panel officer-only" id="tab-users-management">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">👥 Kasutajate Haldus & Online/Offline Monitor</h2>
+            <p class="panel-desc">Reaalajas ülevaade veebilehe külastajatest. Ohvitserid saavad hoiatada, määrata bänni või kustutada kontosid.</p>
+          </div>
+          <div class="filter-controls">
+            <button class="filter-btn active" data-filter="all">Kõik</button>
+            <button class="filter-btn" data-filter="online">🟢 Online</button>
+            <button class="filter-btn" data-filter="offline">⚫ Offline</button>
+            <button class="filter-btn" data-filter="banned">🚫 Bännitud</button>
+          </div>
+        </div>
+
+        <div class="users-table-container">
+          <table class="tactical-table">
+            <thead>
+              <tr>
+                <th>Staatus</th>
+                <th>Nimi</th>
+                <th>E-post</th>
+                <th>Roll / Tag</th>
+                <th>Hoiatused</th>
+                <th>Bänni staatus</th>
+                <th>Distsiplinaarsed Tegevused</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 6: OHVITSERIDE KOOSSEIS (OFFICERS LIST)                    -->
+      <!-- ============================================================== -->
+      <section class="tab-panel" id="tab-officers-list">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">🛡️ KSG Goverment Ohvitseride Koosseis</h2>
+            <p class="panel-desc">Kõik ametlikud KSG korrakaitse juhid ja ohvitserid. Ohvitserid saavad muuta nimesid, tage ja lisada uusi kandidaate.</p>
+          </div>
+          <div class="panel-actions officer-only hidden">
+            <button class="btn btn-primary" id="btnOpenNominateOfficerModal">
+              <span class="icon">+</span> Esita Uus Ohvitser
+            </button>
+          </div>
+        </div>
+
+        <div class="officers-cards-grid" id="officersCardsGrid">
+          <!-- Dynamically populated cards for Roger, Oliver, Miron, etc. -->
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- TAB 7: ROGER JUHTKOND & KOODID (ROGER ONLY)                    -->
+      <!-- ============================================================== -->
+      <section class="tab-panel roger-only" id="tab-roger-headquarters">
+        <div class="panel-header">
+          <div>
+            <div class="special-badge gold">⭐ ROGER PEA FBI JUHTKOND</div>
+            <h2 class="panel-title">Erijuhtimise Peakorter & Ohvitseride Koodid</h2>
+            <p class="panel-desc">See sektsioon on nähtav <strong>ainult Rogerile</strong>. Siin näed kõigi ohvitseride 5-kohalisi turvakoode, saad kinnitada uusi ohvitsere ja hallata juhtkonda.</p>
+          </div>
+        </div>
+
+        <!-- Section 1: All Officer Codes -->
+        <div class="roger-card">
+          <div class="roger-card-header">
+            <h3>🔑 Ohvitseride 5-Kohalised Sisselogimise Turvakoodid</h3>
+            <span class="confidential-pill">SALAJANE / AINULT ROGERILE</span>
+          </div>
+          <p class="card-hint">Ainult sina (Roger) näed neid koode. Ohvitser saab sisse logida oma 5-kohalise koodiga:</p>
+          
+          <div class="roger-codes-table-wrap">
+            <table class="tactical-table">
+              <thead>
+                <tr>
+                  <th>Ohvitser</th>
+                  <th>Amet / Tag</th>
+                  <th>5-Kohaline Turvakood</th>
+                  <th>Kopeeri</th>
+                </tr>
+              </thead>
+              <tbody id="rogerOfficerCodesTableBody">
+                <!-- Dynamically populated with visible codes! -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Section 2: Officer Nominations (Accept / Deny) -->
+        <div class="roger-card">
+          <div class="roger-card-header">
+            <h3>📬 Kinnitamist Ootavad Uued Ohvitserid</h3>
+            <span class="badge-count" id="nominationsBoxCount">0 ootel</span>
+          </div>
+          <p class="card-hint">Kui ohvitserid lisavad uue inimese, peab Roger selle siin heaks kiitma. Heakskiitmisel luuakse uus 5-kohaline kood, mida saad talle saata!</p>
+          
+          <div class="nominations-list" id="rogerNominationsList">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Section 3: Officer Discipline & Moderation -->
+        <div class="roger-card">
+          <div class="roger-card-header">
+            <h3>⚡ Ohvitseride Distsipliin & Juhtimine</h3>
+          </div>
+          <p class="card-hint">Roger saab hoiatada, määrata bänni või eemaldada ametist teisi ohvitsere:</p>
+          
+          <div class="officer-discipline-list" id="rogerDisciplineList">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="tactical-footer">
+      <div class="footer-left">
+        <span>&copy; 2026 KSG Goverment. Kõik õigused kaitstud. Kadrioru Saksa Gümnaasium.</span>
+      </div>
+      <div class="footer-right">
+        <span class="deployment-badge">🚀 Valmis Renderis Majutamiseks (Port 3000 / Dynamic PORT)</span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODALS                                                         -->
+  <!-- ============================================================== -->
+
+  <!-- 1. Login / Sign-In Modal -->
+  <div class="modal-overlay hidden" id="loginModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <img src="assets/ksg_logo.jpg" class="modal-crest-small" alt="KSG">
+          <h3>Sisenemine KSG Goverment Portaali</h3>
+        </div>
+        <button class="modal-close-btn" data-close="loginModal">&times;</button>
+      </div>
+
+      <div class="modal-tabs">
+        <button class="modal-tab active" id="tabLoginOfficer">Ohvitseri Sisenemine (5-Kohaline Kood)</button>
+        <button class="modal-tab" id="tabLoginCitizen">Kodaniku Logi Sisse (E-post & Parool)</button>
+      </div>
+
+      <!-- Officer Login Form -->
+      <form class="modal-body" id="formOfficerLogin">
+        <div class="form-notice">
+          <strong>Ohvitseri Ligipääs:</strong> Sisesta oma 5-kohaline turvakood. E-post ja parool võivad olla suvalised.
+        </div>
+        <div class="form-group">
+          <label class="form-label">Ohvitseri 5-kohaline Turvakood:</label>
+          <input type="text" maxlength="5" pattern="[0-9]{5}" class="form-input code-highlight" id="officerLoginCode" placeholder="Näide: 77701" required autocomplete="off">
+          <small class="field-hint">Roger: 77701 | Oliver: 54321 | Miron: 99001</small>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">E-post (vabatahtlik/suvaline):</label>
+            <input type="text" class="form-input" id="officerLoginEmail" placeholder="officer@ksg.ee">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Parool (vabatahtlik/suvaline):</label>
+            <input type="password" class="form-input" id="officerLoginPass" placeholder="******">
+          </div>
+        </div>
+        <div class="form-error hidden" id="officerLoginError"></div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary btn-block">Sisene Ohvitserina</button>
+        </div>
+      </form>
+
+      <!-- Citizen Login Form -->
+      <form class="modal-body hidden" id="formCitizenLogin">
+        <div class="form-group">
+          <label class="form-label">E-post:</label>
+          <input type="email" class="form-input" id="citizenLoginEmail" placeholder="nimi@gmail.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Parool:</label>
+          <input type="password" class="form-input" id="citizenLoginPass" placeholder="Teie parool" required>
+        </div>
+        <div class="form-error hidden" id="citizenLoginError"></div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary btn-block">Logi Sisse</button>
+        </div>
+        <div class="switch-link">
+          Pole veel kontot? <a href="#" id="linkSwitchToRegister">Registreeru siin</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. Register Modal (Citizens) -->
+  <div class="modal-overlay hidden" id="registerModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <img src="assets/ksg_logo.jpg" class="modal-crest-small" alt="KSG">
+          <h3>Registreeru Kodanikuna / Õpilasena</h3>
+        </div>
+        <button class="modal-close-btn" data-close="registerModal">&times;</button>
+      </div>
+      <form class="modal-body" id="formRegister">
+        <div class="form-group">
+          <label class="form-label">Teie Täisnimi:</label>
+          <input type="text" class="form-input" id="regName" placeholder="Eesnimi ja Perekonnanimi" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">E-post:</label>
+          <input type="email" class="form-input" id="regEmail" placeholder="opilane@gmail.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Loo Parool:</label>
+          <input type="password" class="form-input" id="regPassword" placeholder="Vähemalt 4 märki" required>
+        </div>
+        <div class="form-error hidden" id="registerError"></div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary btn-block">Loo Konto</button>
+        </div>
+        <div class="switch-link">
+          Konto juba olemas? <a href="#" id="linkSwitchToLogin">Logi sisse siin</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. Create Announcement Modal -->
+  <div class="modal-overlay hidden" id="announcementModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>+ Uus KSG Goverment Teadaanne</h3>
+        <button class="modal-close-btn" data-close="announcementModal">&times;</button>
+      </div>
+      <form class="modal-body" id="formNewAnnouncement">
+        <div class="form-group">
+          <label class="form-label">Teate Pealkiri:</label>
+          <input type="text" class="form-input" id="annTitle" placeholder="Näide: Muudatus korrapidajate graafikus" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Kategooria / Silt:</label>
+          <select class="form-input" id="annTag">
+            <option value="TÄHTIS TEADAANNE">TÄHTIS TEADAANNE</option>
+            <option value="KORRAPIDAMINE">KORRAPIDAMINE</option>
+            <option value="KORRAREEGLID">KORRAREEGLID</option>
+            <option value="OPERATIIVNE">OPERATIIVNE INFO</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Teate Sisu:</label>
+          <textarea class="form-input" id="annContent" rows="4" placeholder="Kirjutage teadaande täistekst siia..." required></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary-outline" data-close="announcementModal">Tühista</button>
+          <button type="submit" class="btn btn-primary">Avalda Teade</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. Create New Case Modal -->
+  <div class="modal-overlay hidden" id="newCaseModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>+ Uue Toimiku Algatamine</h3>
+        <button class="modal-close-btn" data-close="newCaseModal">&times;</button>
+      </div>
+      <form class="modal-body" id="formNewCase">
+        <div class="form-group">
+          <label class="form-label">Toimiku Pealkiri:</label>
+          <input type="text" class="form-input" id="caseTitle" placeholder="Näide: Garderoobi intsident 8. klassiga" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Kahtlustatav / Seotud isik:</label>
+            <input type="text" class="form-input" id="caseSuspect" placeholder="Eesnimi või kirjeldus" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Kategooria:</label>
+            <select class="form-input" id="caseCategory">
+              <option value="Korra rikkumine">Korra rikkumine</option>
+              <option value="Tõuklemine ja kaklus">Tõuklemine ja kaklus</option>
+              <option value="Ropendamine ja kiusamine">Ropendamine ja kiusamine</option>
+              <option value="Sisekorra eiramine">Sisekorra eiramine</option>
+              <option value="Muu juhtum">Muu juhtum</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Toimiku Kirjeldus ja Tõendid:</label>
+          <textarea class="form-input" id="caseDescription" rows="4" placeholder="Kirjeldage intsidendi asjaolusid, asukohta ja täheldatud tegevusi..." required></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary-outline" data-close="newCaseModal">Tühista</button>
+          <button type="submit" class="btn btn-primary">Loo Toimik ja Genereeri Kood</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. Created Case Code Success Modal -->
+  <div class="modal-overlay hidden" id="caseCreatedSuccessModal">
+    <div class="modal-box text-center">
+      <div class="success-icon">✅</div>
+      <h3>Toimik On Edukalt Loodud!</h3>
+      <p>Sellele juhtumile genereeriti salajane 5-kohaline ligipääsukood:</p>
+      
+      <div class="code-display-box" id="generatedCaseCode">12345</div>
+      
+      <p class="code-hint">Saada see kood neile inimestele või ohvitseridele, kellele soovid anda ligipääsu antud toimikule!</p>
+      
+      <div class="modal-footer justify-center">
+        <button class="btn btn-primary" id="btnCopyCaseCode">Kopeeri kood</button>
+        <button class="btn btn-secondary-outline" data-close="caseCreatedSuccessModal">Valmis</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Warn User Modal -->
+  <div class="modal-overlay hidden" id="warnUserModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>⚠️ Määra Hoiatus Kasutajale</h3>
+        <button class="modal-close-btn" data-close="warnUserModal">&times;</button>
+      </div>
+      <form class="modal-body" id="formWarnUser">
+        <input type="hidden" id="warnTargetUserId">
+        <div class="target-user-info" id="warnTargetUserName">Kasutaja: -</div>
+        <div class="form-group">
+          <label class="form-label">Hoiatuse Tekst (Põhjus):</label>
+          <textarea class="form-input" id="warnCustomText" rows="3" placeholder="Näide: Jooksmine koridoris ja korrapidaja korralduse eiramine." required></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary-outline" data-close="warnUserModal">Tühista</button>
+          <button type="submit" class="btn btn-warning">Väljasta Hoiatus</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 7. Ban User Modal -->
+  <div class="modal-overlay hidden" id="banUserModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>🚫 Määra Bänn Kasutajale</h3>
+        <button class="modal-close-btn" data-close="banUserModal">&times;</button>
+      </div>
+      <form class="modal-body" id="formBanUser">
+        <input type="hidden" id="banTargetUserId">
+        <div class="target-user-info" id="banTargetUserName">Kasutaja: -</div>
+        
+        <div class="form-group">
+          <label class="form-label">Bänni Kestus:</label>
+          <select class="form-input" id="banDuration">
+            <option value="5">5 minutit</option>
+            <option value="15">15 minutit</option>
+            <option value="60">1 tund</option>
+            <option value="1440">1 päev (24 tundi)</option>
+            <option value="10080">7 päeva (1 nädal)</option>
+            <option value="permanent">Igavene (Permanent)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Bänni Põhjus:</label>
+          <textarea class="form-input" id="banReasonText" rows="3" placeholder="Põhjus, miks konto suletakse..." required></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary-outline" data-close="banUserModal">Tühista</button>
+          <button type="submit" class="btn btn-danger">Kinnita Bänn</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 8. Edit Officer Name / Tag Modal -->
+  <div class="modal-overlay hidden" id="editOfficerModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Muuda Ohvitseri Nime ja Tagi</h3>
+        <button class="modal-close-btn" data-close="editOfficerModal">&times;</button>
+      </div>
+      <form class="modal-body" id="formEditOfficer">
+        <input type="hidden" id="editOfficerId">
+        <div class="form-group">
+          <label class="form-label">Ohvitseri Nimi:</label>
+          <input type="text" class="form-input" id="editOfficerName" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tag / Tiitel (nt. Omanik, Pea Detective, Patrulli Juht):</label>
+          <input type="text" class="form-input" id="editOfficerTag" required>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary-outline" data-close="editOfficerModal">Tühista</button>
+          <button type="submit" class="btn btn-primary">Salvesta Muudatused</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 9. Nominate New Officer Modal (Officers proposal) -->
+  <div class="modal-overlay hidden" id="nominateOfficerModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>+ Esita Uus Ohvitseri Kandidaat</h3>
+        <button class="modal-close-btn" data-close="nominateOfficerModal">&times;</button>
+      </div>
+      <form class="modal-body" id="formNominateOfficer">
+        <div class="form-notice">
+          See ettepanek saadetakse otse <strong>Rogerile (Pea FBI)</strong>. Kui Roger selle heaks kiidab, luuakse ohvitserile unikaalne 5-kohaline kood.
+        </div>
+        <div class="form-group">
+          <label class="form-label">Kandidaadi Täisnimi:</label>
+          <input type="text" class="form-input" id="nominateName" placeholder="Näide: Karl Kask" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Kavandatav Tag / Ametikoht:</label>
+          <input type="text" class="form-input" id="nominateTag" placeholder="Näide: Patrulli Juht" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Põhjendus / Miks ta sobib ohvitseriks:</label>
+          <textarea class="form-input" id="nominateReason" rows="3" placeholder="Põhjus või saavutused..." required></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary-outline" data-close="nominateOfficerModal">Tühista</button>
+          <button type="submit" class="btn btn-primary">Saada Rogerile Kinnitamiseks</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 10. Roger Approved Officer Code Modal -->
+  <div class="modal-overlay hidden" id="rogerApprovalCodeModal">
+    <div class="modal-box text-center">
+      <div class="success-icon">⭐</div>
+      <h3>Uus Ohvitser Kinnitatud!</h3>
+      <p id="rogerApprovedOfficerName">Ohvitser on ametisse määratud.</p>
+      
+      <p>Tema sisselogimise 5-kohaline turvakood on:</p>
+      <div class="code-display-box gold-border" id="rogerApprovedOfficerCode">00000</div>
+      
+      <p class="code-hint">Kopeeri ja saada see 5-kohaline kood uuele ohvitserile, et ta saaks sisse logida!</p>
+      
+      <div class="modal-footer justify-center">
+        <button class="btn btn-primary" id="btnCopyRogerOfficerCode">Kopeeri kood</button>
+        <button class="btn btn-secondary-outline" data-close="rogerApprovalCodeModal">Sulge</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. Live Warning Popup Screen -->
+  <div class="modal-overlay hidden" id="liveWarningModal">
+    <div class="modal-box warning-alert-box text-center">
+      <div class="warning-large-icon">⚠️</div>
+      <h2 class="warning-title">HOIATUS KSG GOVERMENTILT!</h2>
+      <div class="warning-text-box" id="liveWarningText">
+        Teile on määratud hoiatus korrareeglite rikkumise eest.
+      </div>
+      <p class="warning-meta-info" id="liveWarningMeta">Määranud: Oliver (Pea Detective)</p>
+      <p class="warning-strike-count" id="liveWarningStrikes">Teil on 1 hoiatust (5 hoiatuse täitumisel eemaldamine!).</p>
+      <button class="btn btn-primary btn-block" id="btnAcknowledgeLiveWarning">Olen teadlik ja luban reegleid täita</button>
+    </div>
+  </div>
+
+  <!-- 12. Banned Splash Screen -->
+  <div class="modal-overlay banned-overlay hidden" id="bannedSplashModal">
+    <div class="modal-box banned-box text-center">
+      <div class="banned-icon">🚫</div>
+      <h2 class="banned-title">LIGIPÄÄS KEELATUD (BÄNNITUD)</h2>
+      <p class="banned-subtitle">Teie konto on KSG Goverment süsteemist ajutiselt või alaliselt suletud.</p>
+      
+      <div class="banned-reason-box" id="bannedSplashReason">
+        Põhjus: KSG reeglite rikkumine
+      </div>
+      
+      <div class="banned-time-box" id="bannedSplashTime">
+        Bänni lõpp: Permanent
+      </div>
+
+      <button class="btn btn-secondary-outline btn-block" id="btnBannedLogout">Logi Välja</button>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+</body>
+</html>

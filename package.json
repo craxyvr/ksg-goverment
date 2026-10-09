@@ -1,0 +1,17 @@
+{
+  "name": "ksg-goverment",
+  "version": "1.0.0",
+  "description": "KSG Goverment - Kadrioru Saksa Gümnaasiumi Korrakaitse ja Juhtkonna Portaal",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["ksg", "government", "police", "render"],
+  "author": "Roger",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^5.2.1",
+    "ws": "^8.22.0"
+  }
+}
