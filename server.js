@@ -63,111 +63,11 @@ const initialData = {
       createdAt: new Date().toISOString()
     }
   ],
-  users: [
-    {
-      id: 'user_sample_1',
-      name: 'Kodanik Markus',
-      email: 'markus@gmail.com',
-      password: '123',
-      role: 'user',
-      isOfficer: false,
-      tag: 'Kodanik / Õpilane',
-      warnings: [
-        {
-          id: 'w_demo_1',
-          text: 'Keelatud koridoris kiirustamine ja tõuklemine söögivahetunnil.',
-          officer: 'Oliver (Pea Detective)',
-          date: new Date(Date.now() - 3600000 * 5).toISOString()
-        }
-      ],
-      isBanned: false,
-      banUntil: null,
-      banReason: null,
-      lastSeen: new Date().toISOString(),
-      createdAt: new Date().toISOString()
-    }
-  ],
-  applications: [
-    {
-      id: 'app_sample_1',
-      userId: 'user_sample_1',
-      applicantName: 'Kodanik Markus',
-      applicantEmail: 'markus@gmail.com',
-      answers: 'Nõustun kõigi KSG Goverment reeglitega. Olen kohusetundlik ja valmis panustama koolirahu tagamisse.',
-      status: 'pending',
-      createdAt: new Date(Date.now() - 3600000 * 2).toISOString(),
-      comments: [
-        {
-          id: 'c_1',
-          authorName: 'Roger (Pea FBI)',
-          authorRole: 'roger',
-          text: 'Tere Markus! Mis klassis sa käid ja kas oled valmis esmaspäeviti korrapidamist alustama?',
-          date: new Date(Date.now() - 3600000).toISOString()
-        }
-      ]
-    }
-  ],
-  cases: [
-    {
-      id: 'case_101',
-      code: '12345', // 5-digit access code for this case
-      title: 'Garderoobi turvarikkumine ja korrarikkumine',
-      suspectName: 'Tundmatu 8. klassi õpilane',
-      category: 'Rikkumine',
-      description: 'Teise korruse garderoobis tuvastatud valju häälega kisa, kapi uste paugutamine ja keeldumine korrapidaja korraldustele allumast.',
-      status: 'Uurimisel',
-      createdBy: 'Oliver (Pea Detective)',
-      createdAt: new Date(Date.now() - 86400000).toISOString(),
-      updatedAt: new Date(Date.now() - 86400000).toISOString(),
-      notes: [
-        {
-          id: 'cn_1',
-          author: 'Oliver',
-          text: 'Turvakaamera salvestis vaadatud. Isik kannab musta kapuutsiga pusa.',
-          date: new Date(Date.now() - 80000000).toISOString()
-        }
-      ]
-    },
-    {
-      id: 'case_102',
-      code: '58291',
-      title: 'Söökla toidujärjekorra vahelesegamine',
-      suspectName: 'Kevin P.',
-      category: 'Korra rikkumine',
-      description: 'Ebaseaduslik järjekorra vahele trügimine ja kaasõpilaste tõukamine.',
-      status: 'Lahendatud',
-      createdBy: 'Roger (Pea FBI)',
-      createdAt: new Date(Date.now() - 172800000).toISOString(),
-      updatedAt: new Date(Date.now() - 100000000).toISOString(),
-      notes: [
-        {
-          id: 'cn_2',
-          author: 'Roger',
-          text: 'Suunatud korrapäraselt järjekorra lõppu. Õpilane vabandas ja intsident lahendatud.',
-          date: new Date(Date.now() - 100000000).toISOString()
-        }
-      ]
-    }
-  ],
+  users: [],
+  applications: [],
+  cases: [],
   pendingOfficers: [],
-  announcements: [
-    {
-      id: 'ann_1',
-      title: 'KSG Goverment Ametlik Süsteemi Käivitamine',
-      content: 'Tere tulemast Kadrioru Saksa Gümnaasiumi korrakaitse portaali. Kõik ohvitserid ja õpilased peavad rangelt kinni pidama koolikorrast. Ohvitserid on valvel iga tund esmaspäevast reedeni kooli ajal!',
-      author: 'Roger (Pea FBI)',
-      tag: 'TÄHTIS TEADAANNE',
-      createdAt: new Date().toISOString()
-    },
-    {
-      id: 'ann_2',
-      title: 'Ohvitseride Õppused ja Korrapidamine',
-      content: 'Tuletame meelde: õppused toimuvad iga 2 päeva tagant. Keegi ei tohi kamandada ilma põhjuseta ja oleme kõik võrdsed. 5 hoiatuse täitumisel vabastatakse ohvitser ametist.',
-      author: 'Oliver (Pea Detective)',
-      tag: 'KORRAPIDAMINE',
-      createdAt: new Date(Date.now() - 3600000 * 12).toISOString()
-    }
-  ]
+  announcements: []
 };
 
 // Database helper functions
