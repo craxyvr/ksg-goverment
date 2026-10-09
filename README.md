@@ -1,18 +1,8 @@
-# KSG Goverment - Kadrioru Saksa Gümnaasiumi Korrakaitse Portaal
+## KSG Goverment - Kadrioru Saksa Gümnaasiumi Korrakaitse Portaal
 
 Ametlik veebisüsteem KSG Goverment ohvitseridele ja kodanikele.
 
-## Ohvitseride Sisselogimise Koodid (SALAJANE!)
-
-| Ohvitser | Roll | 5-Kohaline Turvakood |
-|---|---|---|
-| Roger | Pea FBI | `77701` |
-| Oliver | Pea Detective | `54321` |
-| Miron | Omanik | `99001` |
-
-> **Kuidas logida ohvitserina sisse?**
-> Kliki "Logi sisse" → vali "Ohvitseri Sisenemine" → sisesta 5-kohaline kood.
-> E-post ja parool võivad olla suvalised!
+> Ohvitseride sisselogimise koodid on salajased ja jagatakse otse ohvitseridele.
 
 ---
 
